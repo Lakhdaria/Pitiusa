@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+:root {
+  --color-ink: #0e0d0b;
+  --color-surface: #17140f;
+  --color-surface-raised: #1e1a13;
+  --color-bone: #ede6d8;
+  --color-bone-dim: #c9c2b4;
+  --color-oak: #c9a876;
+  --color-brass: #8a7350;
+  --color-brass-dim: #5f5238;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-bone: var(--color-bone);
+  --color-bone-dim: var(--color-bone-dim);
+  --color-oak: var(--color-oak);
+  --color-brass: var(--color-brass);
+  --color-brass-dim: var(--color-brass-dim);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-oak);
+  color: var(--color-ink);
+}
+
+@media (pointer: fine) {
+  .custom-cursor-active,
+  .custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+/* --- Reveal on scroll: several distinct entrance textures, reversible --- */
+
+.reveal {
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-up {
+  transform: translateY(28px);
+}
+
+.reveal.reveal-scale {
+  transform: scale(0.94);
+}
+
+.reveal.reveal-left {
+  transform: translateX(-32px);
+}
+
+.reveal.reveal-right {
+  transform: translateX(32px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Scroll-linked word colouring --- */
+
+.scroll-color-text span {
+  color: var(--color-bone-dim);
+  opacity: 0.45;
+  transition: color 500ms ease, opacity 500ms ease;
+}
+
+.scroll-color-text span.is-active {
+  color: var(--color-bone);
+  opacity: 1;
+}
+
+.scroll-color-text.quote span {
+  color: var(--color-bone-dim);
+  opacity: 0.4;
+}
+
+.scroll-color-text.quote span.is-active {
+  color: var(--color-oak);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .scroll-color-text span {
+    opacity: 1;
+    color: var(--color-bone);
+  }
+  .scroll-color-text.quote span {
+    color: var(--color-oak);
+  }
+}
