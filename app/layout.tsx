@@ -4,6 +4,7 @@ import "@fontsource-variable/fraunces/wght-italic.css";
 import "@fontsource-variable/inter";
 import "./globals.css";
 import ParticleField from "@/components/ParticleField";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pitiusa.art"),
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="fr">
       <body>
         <ParticleField />
+        <CustomCursor />
         {children}
       </body>
     </html>

@@ -1,19 +1,51 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useScrollProgress } from "@/lib/useScrollProgress";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useIsDesktop } from "@/lib/useIsDesktop";
+
+const quickLinks = [
+  { href: "#histoire", label: "Histoire" },
+  { href: "#presse", label: "Presse" },
+  { href: "#contact", label: "Contact" },
+];
 
 export default function Hero() {
   const reduced = useReducedMotion();
+  const isDesktop = useIsDesktop();
+  const sectionEl = useRef<HTMLElement | null>(null);
   const imageWrapRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Drive the load-in sequence from React state rather than a named
+  // @keyframes animation, so it never silently breaks if the keyframes
+  // get renamed or removed elsewhere. Two rAFs guarantee the browser has
+  // painted the initial (hidden) state before we flip to visible, so the
+  // CSS transition actually has something to animate from.
+  useEffect(() => {
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setMounted(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, []);
 
   // Cursor parallax on the hero image — a few px of drift, purely decorative.
+  // Desktop-only (no real cursor on touch), and paused whenever the hero
+  // scrolls out of view so this rAF loop doesn't run for the whole session.
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !isDesktop) return;
+    const section = sectionEl.current;
+    if (!section) return;
+
     let raf = 0;
+    let running = false;
     let targetX = 0;
     let targetY = 0;
     let curX = 0;
@@ -37,13 +69,32 @@ export default function Hero() {
       raf = requestAnimationFrame(tick);
     };
 
-    window.addEventListener("mousemove", onMove, { passive: true });
-    raf = requestAnimationFrame(tick);
-    return () => {
+    const start = () => {
+      if (running) return;
+      running = true;
+      window.addEventListener("mousemove", onMove, { passive: true });
+      raf = requestAnimationFrame(tick);
+    };
+    const stop = () => {
+      running = false;
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf);
     };
-  }, [reduced]);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) start();
+        else stop();
+      },
+      { threshold: 0 }
+    );
+    observer.observe(section);
+
+    return () => {
+      observer.disconnect();
+      stop();
+    };
+  }, [reduced, isDesktop]);
 
   // Kinetic type: as the hero scrolls out, the headline gains weight and
   // fades slightly, so the transition into the next section feels intentional.
@@ -56,14 +107,17 @@ export default function Hero() {
     el.style.transform = `translate3d(0, ${(progress * 24).toFixed(1)}px, 0)`;
   }, []);
 
-  const sectionRef = useScrollProgress<HTMLDivElement>({
+  const sectionRef = useScrollProgress<HTMLElement>({
     onProgress,
     disabled: reduced,
   });
 
   return (
     <section
-      ref={sectionRef}
+      ref={(el) => {
+        sectionRef.current = el;
+        sectionEl.current = el;
+      }}
       className="relative h-svh min-h-[640px] w-full overflow-hidden bg-ink"
     >
       <div ref={imageWrapRef} className="absolute inset-0">
@@ -73,37 +127,63 @@ export default function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[65%_center] opacity-0 animate-[reveal-up_1800ms_cubic-bezier(0.16,1,0.3,1)_forwards]"
-          style={{ animationDelay: "150ms" }}
+          className={`object-cover object-[65%_center] transition-[opacity,transform] duration-[1600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            mounted ? "opacity-100" : "opacity-0 scale-105"
+          }`}
         />
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/15 to-ink/45" />
-      <div className="pointer-events-none absolute -bottom-32 left-[10%] h-[420px] w-[420px] rounded-full bg-oak/20 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/60" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-oak/10 blur-[140px]" />
 
-      <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-16 md:px-12 md:pb-24">
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
         <p
-          className="mb-5 max-w-lg text-base text-bone-dim opacity-0 animate-[reveal-up_900ms_cubic-bezier(0.16,1,0.3,1)_forwards] md:text-lg"
-          style={{ animationDelay: "900ms" }}
+          className={`mb-6 max-w-lg text-base text-bone-dim transition-all duration-700 ease-out md:text-lg ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "450ms" }}
         >
           Chêne français tricentenaire. Frêne centenaire. Une pièce unique,
           façonnée à la main.
         </p>
         <h1
           ref={headlineRef}
-          className="max-w-4xl font-display text-5xl leading-[1.05] text-bone opacity-0 animate-[reveal-up_1000ms_cubic-bezier(0.16,1,0.3,1)_forwards] md:text-7xl"
-          style={{ animationDelay: "1050ms", fontVariationSettings: "'wght' 380" }}
+          className={`max-w-4xl font-display text-5xl leading-[1.05] text-bone transition-all duration-700 ease-out md:text-7xl ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          }`}
+          style={{ transitionDelay: "600ms", fontVariationSettings: "'wght' 380" }}
         >
           Nous ne construisons pas un simulateur. Nous créons une nouvelle
           catégorie d&rsquo;art.
         </h1>
-      </div>
 
-      <div
-        className="absolute bottom-6 left-1/2 z-10 h-10 w-6 -translate-x-1/2 rounded-full border border-bone-dim/40 opacity-0 animate-[reveal-up_900ms_cubic-bezier(0.16,1,0.3,1)_forwards]"
-        style={{ animationDelay: "1400ms" }}
-        aria-hidden="true"
-      >
-        <span className="absolute left-1/2 top-2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-oak animate-bounce" />
+        <div
+          className={`mt-12 flex flex-col items-center gap-7 transition-all duration-700 ease-out ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "800ms" }}
+        >
+          <a
+            href="#art-station"
+            className="group relative overflow-hidden border border-oak px-9 py-3.5 text-sm tracking-wide"
+          >
+            <span className="absolute inset-0 -translate-x-full bg-oak transition-transform duration-500 ease-out group-hover:translate-x-0" />
+            <span className="relative z-10 text-oak transition-colors duration-500 group-hover:text-ink">
+              Découvrir l&rsquo;Art Station
+            </span>
+          </a>
+
+          <nav className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2">
+            {quickLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-bone-dim transition-colors hover:text-oak"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
       </div>
     </section>
   );

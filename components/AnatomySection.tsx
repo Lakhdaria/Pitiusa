@@ -4,9 +4,8 @@ import Reveal from "./Reveal";
 type Annotation = {
   dotX: number;
   dotY: number;
+  labelY: number;
   side: "left" | "right";
-  lineLeft: number;
-  lineWidth: number;
   labelAnchor: number;
   title: string;
   text: string;
@@ -15,20 +14,18 @@ type Annotation = {
 const annotations: Annotation[] = [
   {
     dotX: 50,
-    dotY: 24,
+    dotY: 22,
+    labelY: 18,
     side: "right",
-    lineLeft: 50,
-    lineWidth: 23,
     labelAnchor: 73,
     title: "Écran incurvé",
     text: "Un champ de vision continu, sans rupture ni reflet parasite.",
   },
   {
-    dotX: 41.2,
-    dotY: 42,
+    dotX: 42.4,
+    dotY: 40,
+    labelY: 14,
     side: "left",
-    lineLeft: 27,
-    lineWidth: 14.2,
     labelAnchor: 27,
     title: "Caissons acoustiques intégrés",
     text: "Le son est sculpté à même la coque, au plus près de l'oreille.",
@@ -36,29 +33,26 @@ const annotations: Annotation[] = [
   {
     dotX: 50,
     dotY: 50,
+    labelY: 50,
     side: "left",
-    lineLeft: 27,
-    lineWidth: 23,
     labelAnchor: 27,
     title: "Retour de force haute-fidélité",
     text: "Le mouvement, les g et les conditions de piste, restitués en temps réel.",
   },
   {
-    dotX: 55.2,
+    dotX: 54.6,
     dotY: 56,
+    labelY: 78,
     side: "right",
-    lineLeft: 55.2,
-    lineWidth: 17.8,
     labelAnchor: 73,
     title: "Navigation tactile embarquée",
     text: "Un écran unique condense toute la navigation — plus besoin de souris ni de clavier.",
   },
   {
-    dotX: 36.4,
-    dotY: 66,
+    dotX: 37.8,
+    dotY: 64,
+    labelY: 88,
     side: "left",
-    lineLeft: 27,
-    lineWidth: 9.4,
     labelAnchor: 27,
     title: "Chêne et frêne massifs",
     text: "Chaque coque est façonnée à la main par notre réseau d'artisans.",
@@ -74,50 +68,64 @@ export default function AnatomySection() {
         </h2>
       </Reveal>
 
-      {/* Desktop: centred diagram with leader lines */}
+      {/* Desktop: centred diagram with diagonal leader lines, generously spaced */}
       <Reveal variant="scale" delayMs={150}>
-        <div className="relative mx-auto mt-24 hidden h-[560px] max-w-4xl md:block">
+        <div className="relative mx-auto mt-24 hidden h-[760px] max-w-6xl md:block">
           <div
             className="absolute top-0 h-full overflow-hidden rounded-sm"
-            style={{ left: "30%", width: "40%" }}
+            style={{ left: "31%", width: "38%" }}
           >
             <Image
               src="/images/cockpit-top.jpg"
               alt="Vue de dessus du poste de pilotage de la Pitiusa Art Station"
               fill
-              sizes="360px"
+              sizes="440px"
               className="object-cover"
             />
           </div>
 
+          <svg
+            className="absolute inset-0 h-full w-full overflow-visible"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {annotations.map((a, i) => (
+              <line
+                key={i}
+                x1={a.dotX}
+                y1={a.dotY}
+                x2={a.labelAnchor}
+                y2={a.labelY}
+                stroke="var(--color-brass)"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+          </svg>
+
           {annotations.map((a, i) => (
-            <div key={i}>
-              <span
-                className="absolute z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oak ring-4 ring-oak/25"
-                style={{ left: `${a.dotX}%`, top: `${a.dotY}%` }}
-              />
-              <span
-                className="absolute h-px bg-brass"
-                style={{
-                  left: `${a.lineLeft}%`,
-                  top: `${a.dotY}%`,
-                  width: `${a.lineWidth}%`,
-                  transform: "translateY(-50%)",
-                }}
-              />
-              <div
-                className="absolute w-52"
-                style={{
-                  top: `${a.dotY}%`,
-                  transform: "translateY(-50%)",
-                  ...(a.side === "left"
-                    ? { right: `${100 - a.labelAnchor}%`, textAlign: "right" as const }
-                    : { left: `${a.labelAnchor}%`, textAlign: "left" as const }),
-                }}
-              >
-                <p className="font-display text-lg text-bone">{a.title}</p>
-                <p className="mt-1 text-sm text-bone-dim">{a.text}</p>
-              </div>
+            <span
+              key={i}
+              className="absolute z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-oak ring-4 ring-oak/25"
+              style={{ left: `${a.dotX}%`, top: `${a.dotY}%` }}
+            />
+          ))}
+
+          {annotations.map((a, i) => (
+            <div
+              key={i}
+              className="absolute w-64"
+              style={{
+                top: `${a.labelY}%`,
+                transform: "translateY(-50%)",
+                ...(a.side === "left"
+                  ? { right: `${100 - a.labelAnchor}%`, textAlign: "right" as const }
+                  : { left: `${a.labelAnchor}%`, textAlign: "left" as const }),
+              }}
+            >
+              <p className="font-display text-xl text-bone">{a.title}</p>
+              <p className="mt-2 text-base text-bone-dim">{a.text}</p>
             </div>
           ))}
         </div>

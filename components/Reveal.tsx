@@ -27,15 +27,15 @@ export default function Reveal({
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
+    node.style.transitionDelay = `${delayMs}ms`;
 
+    // Toggling the class both ways (rather than unobserving after the first
+    // reveal) lets the transition run smoothly whether the user scrolls
+    // down into the element or back up past it.
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            (entry.target as HTMLElement).style.animationDelay = `${delayMs}ms`;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
         }
       },
       { threshold: 0.15 }

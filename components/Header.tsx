@@ -29,6 +29,14 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock background scroll while the full-screen menu is open.
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6">
       <div
@@ -60,7 +68,7 @@ export default function Header() {
           aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((v) => !v)}
-          className="relative flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
+          className="relative z-50 flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
         >
           <span
             className={`h-px w-5 bg-bone transition-transform duration-300 ${
@@ -80,25 +88,42 @@ export default function Header() {
         </button>
       </div>
 
+      {/* Full-screen takeover menu, in the spirit of a studio/agency site */}
       <div
-        className={`fixed inset-x-4 top-20 z-40 overflow-hidden rounded-2xl border border-brass-dim/40 bg-surface/95 backdrop-blur-xl transition-all duration-300 md:hidden ${
-          menuOpen
-            ? "max-h-64 opacity-100"
-            : "pointer-events-none max-h-0 opacity-0"
+        className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/98 backdrop-blur-2xl transition-opacity duration-500 md:hidden ${
+          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <nav className="flex flex-col gap-1 p-4">
-          {links.map((link) => (
+        <nav className="flex flex-col px-8">
+          {links.map((link, i) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="rounded-lg px-3 py-3 text-bone-dim transition-colors hover:bg-surface-raised hover:text-bone"
+              className={`group flex items-baseline gap-4 border-b border-brass-dim/25 py-5 transition-all duration-500 ease-out ${
+                menuOpen ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+              }`}
+              style={{ transitionDelay: menuOpen ? `${150 + i * 90}ms` : "0ms" }}
             >
-              {link.label}
+              <span className="font-display text-sm text-brass-dim">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="font-display text-4xl text-bone transition-all duration-300 ease-out group-hover:translate-x-3 group-hover:text-oak group-active:translate-x-3 group-active:text-oak">
+                {link.label}
+              </span>
             </a>
           ))}
         </nav>
+
+        <div
+          className={`mt-16 px-8 transition-all duration-500 ease-out ${
+            menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          }`}
+          style={{ transitionDelay: menuOpen ? `${150 + links.length * 90 + 100}ms` : "0ms" }}
+        >
+          <p className="font-display text-lg text-bone">Pitiusa Art Station</p>
+          <p className="mt-1 text-sm text-bone-dim">Fabriqué en France</p>
+        </div>
       </div>
     </header>
   );

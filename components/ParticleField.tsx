@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
+import { useIsDesktop } from "@/lib/useIsDesktop";
 
 type Particle = {
   x: number;
@@ -15,9 +16,11 @@ type Particle = {
 export default function ParticleField() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const reduced = useReducedMotion();
+  const isDesktop = useIsDesktop();
+  const disabled = reduced || !isDesktop;
 
   useEffect(() => {
-    if (reduced) return;
+    if (disabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -112,9 +115,9 @@ export default function ParticleField() {
       window.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [reduced]);
+  }, [disabled]);
 
-  if (reduced) return null;
+  if (disabled) return null;
 
   return (
     <canvas
