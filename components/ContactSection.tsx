@@ -14,7 +14,7 @@ export default function ContactSection() {
           <p className="mt-6 max-w-xl text-lg text-bone-dim">
             Chaque Pitiusa est construite intégralement sur commande, en
             {" "}{product.buildTime}. La première édition est limitée à{" "}
-            {product.editionSize}, à {product.price}.
+            {product.editionSize}.
           </p>
           <p className="mt-6 max-w-xl text-lg text-bone-dim">
             Pour une visite privée, une demande presse ou toute autre
