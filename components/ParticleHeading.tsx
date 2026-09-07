@@ -45,7 +45,7 @@ export default function ParticleHeading({
     let ready = false;
     let cancelled = false;
     let inView = false;
-    let particleColor = "#ede6d8";
+    const particleColor = "#211e1a";
 
     const build = () => {
       width = container.clientWidth;
@@ -62,10 +62,9 @@ export default function ParticleHeading({
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      particleColor =
-        getComputedStyle(document.documentElement)
-          .getPropertyValue("--color-bone")
-          .trim() || "#ede6d8";
+      // Fixed dark ink tone — kept in sync manually with --color-bone in
+      // globals.css rather than read at runtime, since a stale/empty
+      // lookup here would silently fall back to an invisible colour.
 
       const off = document.createElement("canvas");
       off.width = width;
