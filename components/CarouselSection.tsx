@@ -17,9 +17,8 @@ const COUNT = slides.length;
 export default function CarouselSection() {
   const reduced = useReducedMotion();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const captionRefs = useRef<Array<HTMLParagraphElement | null>>([]);
-  const lastCardRect = useRef<{ top: number; left: number; width: number; height: number } | null>(null);
+  const frameRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const dotRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
   useEffect(() => {
     if (reduced) return;
@@ -32,86 +31,42 @@ export default function CarouselSection() {
       ticking = false;
       const rect = wrapper.getBoundingClientRect();
       const vh = window.innerHeight;
-      const vw = window.innerWidth;
       const scrollable = wrapper.offsetHeight - vh;
       const raw = scrollable > 0 ? -rect.top / scrollable : 0;
       const progress = Math.min(1, Math.max(0, raw));
 
       const segment = 1 / COUNT;
-      const continuous = progress / segment; // fractional position across the deck
-      const index = Math.min(COUNT - 1, Math.floor(continuous));
-      const localT = continuous - index;
-      const isDesktop = vw >= 768;
-      const spacingVw = isDesktop ? 56 : 0;
-      const spacingVh = isDesktop ? 0 : 46;
+      const rawIndex = progress / segment;
+      const index = Math.min(COUNT - 1, Math.floor(rawIndex));
+      const localT = rawIndex - index;
 
-      const isLastFocused = index === COUNT - 1;
-
-      slides.forEach((_, i) => {
-        const card = cardRefs.current[i];
-        const caption = captionRefs.current[i];
-        if (!card) return;
-
-        // The last card, once focused, breaks out of the deck entirely and
-        // grows to cover the full viewport — handled as a special case.
-        if (i === COUNT - 1 && isLastFocused) {
-          if (!lastCardRect.current) {
-            const r = card.getBoundingClientRect();
-            lastCardRect.current = { top: r.top, left: r.left, width: r.width, height: r.height };
+      frameRefs.current.forEach((el, i) => {
+        if (!el) return;
+        if (i < index) {
+          el.style.opacity = "0";
+          el.style.transform = "scale(1.04)";
+        } else if (i === index) {
+          const isLast = i === COUNT - 1;
+          if (isLast) {
+            const exitT = Math.max(0, (localT - 0.6) / 0.4);
+            const scale = 1 + exitT * 1.8;
+            el.style.opacity = `${1 - exitT}`;
+            el.style.transform = `scale(${scale.toFixed(3)})`;
+          } else {
+            const outT = Math.max(0, (localT - 0.72) / 0.28);
+            el.style.opacity = `${1 - outT}`;
+            el.style.transform = `scale(${(1 + outT * 0.06).toFixed(3)})`;
           }
-          const start = lastCardRect.current;
-          const growT = 1 - Math.pow(1 - Math.min(1, localT / 0.85), 3);
-          const fadeT = Math.max(0, (localT - 0.86) / 0.14);
-
-          const top = start.top * (1 - growT);
-          const left = start.left * (1 - growT);
-          const width = start.width + (vw - start.width) * growT;
-          const height = start.height + (vh - start.height) * growT;
-
-          card.style.position = "fixed";
-          card.style.top = `${top}px`;
-          card.style.left = `${left}px`;
-          card.style.width = `${width}px`;
-          card.style.height = `${height}px`;
-          card.style.transform = "none";
-          card.style.opacity = `${1 - fadeT}`;
-          card.style.borderRadius = `${Math.max(0, 1.5 * (1 - growT)).toFixed(2)}rem`;
-          card.style.zIndex = "40";
-          card.style.filter = "none";
-          if (caption) caption.style.opacity = `${1 - growT}`;
-          return;
+        } else {
+          el.style.opacity = "0";
+          el.style.transform = "scale(0.98)";
         }
+      });
 
-        // Every other card (including the last one before it's focused)
-        // sits on a smooth, continuously scroll-linked "coverflow" track.
-        if (lastCardRect.current && i === COUNT - 1) {
-          card.style.position = "";
-          card.style.top = "";
-          card.style.left = "";
-          card.style.width = "";
-          card.style.height = "";
-          lastCardRect.current = null;
-        }
-
-        const offset = i - continuous;
-        const absOffset = Math.abs(offset);
-        const scale = Math.max(0.55, 1.22 - absOffset * 0.32);
-        const opacity = Math.max(0, 1 - absOffset * 0.7);
-        const brightness = Math.max(0.4, 1 - Math.min(absOffset, 1) * 0.55);
-
-        card.style.position = "";
-        card.style.top = "";
-        card.style.left = "";
-        card.style.width = "";
-        card.style.height = "";
-        card.style.zIndex = `${100 - Math.round(absOffset * 10)}`;
-        card.style.borderRadius = "1.5rem";
-        card.style.transform = isDesktop
-          ? `translate3d(calc(-50% + ${(offset * spacingVw).toFixed(2)}vw), -50%, 0) scale(${scale.toFixed(3)})`
-          : `translate3d(-50%, calc(-50% + ${(offset * spacingVh).toFixed(2)}vh), 0) scale(${scale.toFixed(3)})`;
-        card.style.opacity = `${opacity.toFixed(3)}`;
-        card.style.filter = `brightness(${brightness.toFixed(2)}) saturate(${brightness.toFixed(2)})`;
-        if (caption) caption.style.opacity = `${Math.max(0, 1 - absOffset * 2.2).toFixed(2)}`;
+      dotRefs.current.forEach((el, i) => {
+        if (!el) return;
+        el.style.backgroundColor = i === index ? "var(--color-oak)" : "var(--color-brass-dim)";
+        el.style.transform = i === index ? "scale(1.4)" : "scale(1)";
       });
     };
 
@@ -134,18 +89,26 @@ export default function CarouselSection() {
   if (reduced) {
     return (
       <section className="bg-ink px-6 py-24 md:px-12">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-5xl">
           <h2 className="mb-10 font-display text-4xl text-bone md:text-5xl">
             En images
           </h2>
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex snap-x gap-6 overflow-x-auto pb-4">
             {slides.map((s) => (
               <div
                 key={s.src}
-                className="relative aspect-[4/3] w-[45%] min-w-[220px] flex-1 overflow-hidden rounded-2xl shadow-xl"
+                className="relative aspect-[4/3] w-[80%] shrink-0 snap-center md:w-[45%]"
               >
-                <Image src={s.src} alt={s.caption} fill sizes="30vw" className="object-cover" />
-                <p className="absolute bottom-4 left-4 font-display text-lg text-bone">{s.caption}</p>
+                <Image
+                  src={s.src}
+                  alt={s.caption}
+                  fill
+                  sizes="60vw"
+                  className="rounded-sm object-cover"
+                />
+                <p className="absolute bottom-4 left-4 font-display text-xl text-bone md:text-2xl">
+                  {s.caption}
+                </p>
               </div>
             ))}
           </div>
@@ -160,35 +123,48 @@ export default function CarouselSection() {
       className="relative bg-ink"
       style={{ height: `${COUNT * 100}svh` }}
     >
-      <div className="sticky top-0 h-svh w-full overflow-hidden">
+      <div className="sticky top-0 h-svh w-full overflow-hidden bg-ink">
         {slides.map((s, i) => (
           <div
             key={s.src}
             ref={(el) => {
-              cardRefs.current[i] = el;
+              frameRefs.current[i] = el;
             }}
-            className="absolute left-1/2 top-1/2 aspect-[3/4] w-[74vw] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.55)] ring-1 ring-brass-dim/30 md:aspect-[4/3] md:w-[50vw]"
-            style={{ borderRadius: "1.5rem", willChange: "transform, opacity" }}
+            className="absolute inset-0"
+            style={{
+              opacity: i === 0 ? 1 : 0,
+              willChange: "transform, opacity",
+            }}
           >
             <Image
               src={s.src}
               alt={s.caption}
               fill
               priority={i === 0}
-              sizes="(min-width: 768px) 50vw, 74vw"
+              sizes="100vw"
               className="object-cover"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
-            <p
-              ref={(el) => {
-                captionRefs.current[i] = el;
-              }}
-              className="absolute bottom-6 left-6 right-6 font-display text-2xl text-bone md:bottom-10 md:left-10 md:text-4xl"
-            >
-              {s.caption}
-            </p>
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-ink/35" />
+            <div className="absolute bottom-16 left-6 md:left-12">
+              <p className="max-w-2xl font-display text-3xl text-bone md:text-5xl">
+                {s.caption}
+              </p>
+            </div>
           </div>
         ))}
+
+        <div className="absolute right-6 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-3 md:right-12">
+          {slides.map((_, i) => (
+            <span
+              key={i}
+              ref={(el) => {
+                dotRefs.current[i] = el;
+              }}
+              className="h-2 w-2 rounded-full transition-transform duration-300"
+              style={{ backgroundColor: "var(--color-brass-dim)" }}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

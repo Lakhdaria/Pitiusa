@@ -1,4 +1,5 @@
 export const product = {
+  price: "375 000 €",
   editionSize: "cinq exemplaires",
   buildTime: "environ six mois",
   materials: "chêne français tricentenaire et frêne centenaire",
