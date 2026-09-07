@@ -42,8 +42,8 @@ export default function CarouselSection() {
       const index = Math.min(COUNT - 1, Math.floor(continuous));
       const localT = continuous - index;
       const isDesktop = vw >= 768;
-      const spacingVw = isDesktop ? 56 : 0;
-      const spacingVh = isDesktop ? 0 : 46;
+      const spacingVw = isDesktop ? 34 : 0;
+      const spacingVh = isDesktop ? 0 : 30;
 
       const isLastFocused = index === COUNT - 1;
 
@@ -95,7 +95,7 @@ export default function CarouselSection() {
 
         const offset = i - continuous;
         const absOffset = Math.abs(offset);
-        const scale = Math.max(0.55, 1.22 - absOffset * 0.32);
+        const scale = Math.max(0.5, 1.06 - absOffset * 0.26);
         const opacity = Math.max(0, 1 - absOffset * 0.7);
         const brightness = Math.max(0.4, 1 - Math.min(absOffset, 1) * 0.55);
 
@@ -167,14 +167,14 @@ export default function CarouselSection() {
             ref={(el) => {
               cardRefs.current[i] = el;
             }}
-            className="absolute left-1/2 top-1/2 aspect-[3/4] w-[74vw] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.55)] ring-1 ring-brass-dim/30 md:aspect-[4/3] md:w-[50vw]"
+            className="absolute left-1/2 top-1/2 aspect-[3/4] w-[46vw] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.35)] ring-1 ring-brass-dim/50 md:aspect-[4/3] md:w-[27vw]"
             style={{ borderRadius: "1.5rem", willChange: "transform, opacity" }}
           >
             <Image
               src={s.src}
               alt={s.caption}
               fill
-              sizes="(min-width: 768px) 50vw, 74vw"
+              sizes="(min-width: 768px) 27vw, 46vw"
               className="object-cover"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />

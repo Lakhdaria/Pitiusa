@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --color-ink: #0e0d0b;
-  --color-surface: #17140f;
-  --color-surface-raised: #1e1a13;
-  --color-bone: #ede6d8;
-  --color-bone-dim: #c9c2b4;
-  --color-oak: #c9a876;
-  --color-brass: #8a7350;
-  --color-brass-dim: #5f5238;
+  --color-ink: #f7f4ef;
+  --color-surface: #efeae1;
+  --color-surface-raised: #e4ddcf;
+  --color-bone: #211e1a;
+  --color-bone-dim: #6b6357;
+  --color-oak: #a97c42;
+  --color-brass: #8b7355;
+  --color-brass-dim: #dad0be;
   --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
   --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }

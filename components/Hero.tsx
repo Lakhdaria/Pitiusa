@@ -132,10 +132,9 @@ export default function Hero() {
           }`}
         />
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/60" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-oak/10 blur-[140px]" />
 
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+      <div className="relative z-10 flex h-full flex-col items-start justify-start px-6 pt-32 text-left md:px-12 md:pt-40">
         <p
           className={`mb-6 max-w-lg text-base text-bone-dim transition-all duration-700 ease-out md:text-lg ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -147,7 +146,7 @@ export default function Hero() {
         </p>
         <h1
           ref={headlineRef}
-          className={`max-w-4xl font-display text-5xl leading-[1.05] text-bone transition-all duration-700 ease-out md:text-7xl ${
+          className={`max-w-2xl font-display text-5xl leading-[1.05] text-bone transition-all duration-700 ease-out md:text-7xl ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
           style={{ transitionDelay: "600ms", fontVariationSettings: "'wght' 380" }}
@@ -157,7 +156,7 @@ export default function Hero() {
         </h1>
 
         <div
-          className={`mt-12 flex flex-col items-center gap-7 transition-all duration-700 ease-out ${
+          className={`mt-12 flex flex-col items-start gap-7 transition-all duration-700 ease-out ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
           style={{ transitionDelay: "800ms" }}
@@ -172,7 +171,7 @@ export default function Hero() {
             </span>
           </a>
 
-          <nav className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2">
+          <nav className="flex flex-wrap items-center justify-start gap-x-7 gap-y-2">
             {quickLinks.map((link) => (
               <a
                 key={link.href}

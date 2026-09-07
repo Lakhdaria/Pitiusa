@@ -82,7 +82,7 @@ export default function ParticleField() {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201, 168, 118, ${p.o})`;
+        ctx.fillStyle = `rgba(139, 115, 85, ${p.o})`;
         ctx.fill();
       }
       animationId = requestAnimationFrame(step);
