@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import SimulationsSection from "@/components/SimulationsSection";
 import ProductSection from "@/components/ProductSection";
-import ParticleShowcaseSection from "@/components/ParticleShowcaseSection";
 import AnatomySection from "@/components/AnatomySection";
 import CarouselSection from "@/components/CarouselSection";
 import UsesSection from "@/components/UsesSection";
@@ -16,8 +16,8 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <SimulationsSection />
         <ProductSection />
-        <ParticleShowcaseSection />
         <AnatomySection />
         <CarouselSection />
         <UsesSection />

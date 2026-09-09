@@ -11,15 +11,26 @@ const links = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    let lastY = window.scrollY;
     let ticking = false;
     const onScroll = () => {
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 24);
+          const y = window.scrollY;
+          setScrolled(y > 24);
+          if (!menuOpen) {
+            if (y > lastY && y > 120) {
+              setHidden(true);
+            } else if (y < lastY) {
+              setHidden(false);
+            }
+          }
+          lastY = y;
           ticking = false;
         });
       }
@@ -27,7 +38,7 @@ export default function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [menuOpen]);
 
   // Lock background scroll while the full-screen menu is open.
   useEffect(() => {
@@ -38,57 +49,66 @@ export default function Header() {
   }, [menuOpen]);
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4 md:top-6">
-      <div
-        className={`flex w-full max-w-3xl items-center justify-between rounded-2xl border px-5 py-3 backdrop-blur-xl transition-all duration-500 md:px-7 ${
-          scrolled
-            ? "border-brass-dim/50 bg-surface/70 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
-            : "border-brass-dim/25 bg-surface/35"
+    <>
+      <header
+        className={`fixed inset-x-0 top-4 z-50 flex justify-center px-4 transition-transform duration-500 ease-out md:top-6 ${
+          hidden ? "-translate-y-[150%]" : "translate-y-0"
         }`}
       >
-        <a href="#" className="font-display text-xl tracking-tight text-bone">
-          Pitiusa
-        </a>
-
-        <nav className="hidden md:flex gap-8">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="group relative text-base text-bone-dim transition-colors hover:text-bone"
-            >
-              {link.label}
-              <span className="absolute -bottom-1 left-1/2 h-px w-0 -translate-x-1/2 bg-oak transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
-        </nav>
-
-        <button
-          type="button"
-          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((v) => !v)}
-          className="relative z-50 flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
+        <div
+          className={`flex w-full max-w-3xl items-center justify-between rounded-2xl border px-5 py-3 backdrop-blur-xl transition-all duration-500 md:px-7 ${
+            scrolled
+              ? "border-brass-dim/50 bg-surface/70 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
+              : "border-brass-dim/25 bg-surface/35"
+          }`}
         >
-          <span
-            className={`h-px w-5 bg-bone transition-transform duration-300 ${
-              menuOpen ? "translate-y-[3px] rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-px w-5 bg-bone transition-opacity duration-300 ${
-              menuOpen ? "opacity-0" : "opacity-100"
-            }`}
-          />
-          <span
-            className={`h-px w-5 bg-bone transition-transform duration-300 ${
-              menuOpen ? "-translate-y-[3px] -rotate-45" : ""
-            }`}
-          />
-        </button>
-      </div>
+          <a href="#" className="font-display text-xl tracking-tight text-bone">
+            Pitiusa
+          </a>
 
-      {/* Full-screen takeover menu, in the spirit of a studio/agency site */}
+          <nav className="hidden md:flex gap-8">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="group relative text-base text-bone-dim transition-colors hover:text-bone"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-1/2 h-px w-0 -translate-x-1/2 bg-oak transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
+          </nav>
+
+          <button
+            type="button"
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="relative z-50 flex h-8 w-8 flex-col items-center justify-center gap-[5px] md:hidden"
+          >
+            <span
+              className={`h-px w-5 bg-bone transition-transform duration-300 ${
+                menuOpen ? "translate-y-[3px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`h-px w-5 bg-bone transition-opacity duration-300 ${
+                menuOpen ? "opacity-0" : "opacity-100"
+              }`}
+            />
+            <span
+              className={`h-px w-5 bg-bone transition-transform duration-300 ${
+                menuOpen ? "-translate-y-[3px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
+      </header>
+
+      {/* Rendered as a sibling of <header>, not a child: a transform on an
+          ancestor (our hide/show translate) would otherwise turn it into
+          the containing block for this fixed-position overlay, breaking
+          full-viewport coverage. */}
       <div
         className={`fixed inset-0 z-40 flex flex-col justify-center bg-ink/98 backdrop-blur-2xl transition-opacity duration-500 md:hidden ${
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
@@ -125,6 +145,6 @@ export default function Header() {
           <p className="mt-1 text-sm text-bone-dim">Fabriqué en France</p>
         </div>
       </div>
-    </header>
+    </>
   );
 }

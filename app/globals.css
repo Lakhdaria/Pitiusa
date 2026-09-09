@@ -6,7 +6,7 @@
   --color-surface-raised: #e4ddcf;
   --color-bone: #211e1a;
   --color-bone-dim: #6b6357;
-  --color-oak: #a97c42;
+  --color-oak: #8c5a2b;
   --color-brass: #8b7355;
   --color-brass-dim: #dad0be;
   --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
@@ -54,6 +54,15 @@ body {
   .custom-cursor-active,
   .custom-cursor-active * {
     cursor: none !important;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
