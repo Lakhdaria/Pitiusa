@@ -51,7 +51,7 @@ export default async function SimulationPage({
         </Link>
 
         <div className="mt-10 flex flex-col items-start">
-          <Icon className="h-12 w-12 text-oak" />
+          <Icon className="h-11 w-11 text-oak" strokeWidth={1.25} />
           <h1 className="mt-6 font-display text-4xl leading-tight text-bone md:text-6xl">
             {simulation.title}
           </h1>

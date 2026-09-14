@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const slides = [
@@ -20,6 +20,11 @@ export default function CarouselSection() {
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const captionRefs = useRef<Array<HTMLParagraphElement | null>>([]);
   const lastCardRect = useRef<{ top: number; left: number; width: number; height: number } | null>(null);
+  const loadUpToRef = useRef(1);
+  // Slide 0 loads eagerly (it's what's shown first); the rest are only
+  // requested one slide ahead of where the user has actually scrolled to,
+  // instead of every image firing off a network request on page load.
+  const [loadUpTo, setLoadUpTo] = useState(1);
 
   useEffect(() => {
     if (reduced) return;
@@ -27,6 +32,7 @@ export default function CarouselSection() {
     if (!wrapper) return;
 
     let ticking = false;
+    let listening = false;
 
     const update = () => {
       ticking = false;
@@ -46,6 +52,12 @@ export default function CarouselSection() {
       const spacingVh = isDesktop ? 0 : 34;
 
       const isLastFocused = index === COUNT - 1;
+
+      const wantLoaded = Math.min(COUNT - 1, index + 1);
+      if (wantLoaded > loadUpToRef.current) {
+        loadUpToRef.current = wantLoaded;
+        setLoadUpTo(wantLoaded);
+      }
 
       slides.forEach((_, i) => {
         const card = cardRefs.current[i];
@@ -118,10 +130,30 @@ export default function CarouselSection() {
       }
     };
 
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    // Only run the scroll math (and keep the listener attached at all)
+    // while this ~500vh section is actually near the viewport — otherwise
+    // every scroll anywhere on the page recomputes five card transforms
+    // for a carousel that's nowhere near visible.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const intersecting = entries[0]?.isIntersecting ?? false;
+        if (intersecting && !listening) {
+          listening = true;
+          window.addEventListener("scroll", onScroll, { passive: true });
+          window.addEventListener("resize", onScroll);
+          update();
+        } else if (!intersecting && listening) {
+          listening = false;
+          window.removeEventListener("scroll", onScroll);
+          window.removeEventListener("resize", onScroll);
+        }
+      },
+      { rootMargin: "40% 0px 40% 0px", threshold: 0 }
+    );
+    observer.observe(wrapper);
+
     return () => {
+      observer.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
@@ -167,13 +199,17 @@ export default function CarouselSection() {
             className="absolute left-1/2 top-1/2 aspect-[3/4] w-[58vw] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.25)] ring-4 ring-white md:aspect-[4/3] md:w-[32vw]"
             style={{ borderRadius: "1.5rem", willChange: "transform, opacity" }}
           >
-            <Image
-              src={s.src}
-              alt={s.caption}
-              fill
-              sizes="(min-width: 768px) 32vw, 58vw"
-              className="object-cover"
-            />
+            {i <= loadUpTo ? (
+              <Image
+                src={s.src}
+                alt={s.caption}
+                fill
+                sizes="(min-width: 768px) 32vw, 58vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="h-full w-full bg-surface" aria-hidden="true" />
+            )}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
             <span className="absolute left-6 top-6 font-display text-xs tracking-[0.2em] text-white/80 md:left-8 md:top-8">
               {String(i + 1).padStart(2, "0")}

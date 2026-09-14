@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "@fontsource-variable/fraunces";
 import "@fontsource-variable/fraunces/wght-italic.css";
 import "@fontsource-variable/inter";
+import "@fontsource-variable/cormorant";
+import "@fontsource-variable/cormorant/wght-italic.css";
 import "./globals.css";
 import ParticleField from "@/components/ParticleField";
 import CustomCursor from "@/components/CustomCursor";

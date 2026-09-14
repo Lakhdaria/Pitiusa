@@ -95,9 +95,12 @@ export default function SimulationCard({ simulation }: { simulation: Simulation 
       type="button"
       onClick={handleClick}
       aria-label={`En savoir plus sur ${simulation.title}`}
-      className="group flex h-full w-full flex-col items-center justify-center gap-4 rounded-2xl border border-brass-dim/40 bg-ink px-8 py-12 text-center transition-all duration-300 hover:-translate-y-1 hover:border-oak/60 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+      className="group flex h-full w-full flex-col items-center justify-center gap-5 rounded-2xl border-2 border-brass-dim/70 bg-ink px-8 py-14 text-center transition-all duration-300 hover:-translate-y-1 hover:border-oak hover:shadow-[0_24px_60px_rgba(0,0,0,0.1)]"
     >
-      <Icon className="h-10 w-10 text-oak transition-transform duration-300 group-hover:scale-110" />
+      <Icon
+        className="h-8 w-8 text-oak transition-transform duration-300 group-hover:scale-110"
+        strokeWidth={1.25}
+      />
       <h3 className="font-display text-sm uppercase tracking-[0.18em] text-bone">
         {simulation.title}
       </h3>

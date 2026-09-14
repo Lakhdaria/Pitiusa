@@ -10,9 +10,11 @@ export default function Hero() {
   const reduced = useReducedMotion();
   const isDesktop = useIsDesktop();
   const sectionEl = useRef<HTMLElement | null>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
 
   // Drive the load-in sequence from React state rather than a named
   // @keyframes animation, so it never silently breaks if the keyframes
@@ -21,12 +23,22 @@ export default function Hero() {
   // CSS transition actually has something to animate from.
   useEffect(() => {
     let raf2 = 0;
+    let introTimer = 0;
     const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setMounted(true));
+      raf2 = requestAnimationFrame(() => {
+        setMounted(true);
+        // Once the entrance transition (700ms + its 600ms delay) has had
+        // time to finish, drop the CSS transition entirely. Leaving it on
+        // permanently means every scroll-driven inline-style update below
+        // fights a 700ms easing curve that never has time to catch up —
+        // that's what reads as "laggy" rather than 1:1 with the scroll.
+        introTimer = window.setTimeout(() => setIntroDone(true), 1400);
+      });
     });
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
+      window.clearTimeout(introTimer);
     };
   }, []);
 
@@ -93,21 +105,29 @@ export default function Hero() {
     };
   }, [reduced, isDesktop]);
 
-  // As the hero scrolls out, the headline gains weight and fades all the
-  // way out — a genuine disappearance, not just a partial dim — so the
-  // transition into the next section reads as intentional.
+  // As the hero scrolls out: the headline fades all the way out, and the
+  // whole framed photo shrinks gently toward the centre and dissolves —
+  // a soft, cinematic exit rather than an abrupt cut. Fully reversible
+  // since it's driven continuously by scroll position either way.
   const onProgress = useCallback((progress: number) => {
-    const el = headlineRef.current;
-    if (!el) return;
+    const headline = headlineRef.current;
+    const frame = frameRef.current;
     // A full-viewport hero starts already "half through" this generic
     // 0→1 scroll range (it never enters from below the fold) — so treat
-    // 0.5 as the resting, fully-opaque baseline and only fade from there
-    // as the section actually scrolls away.
+    // 0.5 as the resting, fully-visible baseline and only animate from
+    // there as the section actually scrolls away.
     const fade = Math.max(0, Math.min(1, (progress - 0.5) / 0.5));
-    const weight = 380 + fade * 260;
-    el.style.setProperty("font-variation-settings", `'wght' ${weight.toFixed(0)}`);
-    el.style.opacity = `${Math.max(0, 1 - fade * 1.4)}`;
-    el.style.transform = `translate3d(0, ${(fade * 32).toFixed(1)}px, 0)`;
+
+    if (headline) {
+      const scale = 1 - fade * 0.35;
+      headline.style.opacity = `${Math.max(0, 1 - fade * 1.4)}`;
+      headline.style.transform = `translate3d(0, ${(fade * 32).toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+    }
+    if (frame) {
+      const scale = 1 - fade * 0.22;
+      frame.style.transform = `scale(${scale.toFixed(3)})`;
+      frame.style.opacity = `${Math.max(0, 1 - fade * 1.15)}`;
+    }
   }, []);
 
   const sectionRef = useScrollProgress<HTMLElement>({
@@ -121,13 +141,17 @@ export default function Hero() {
         sectionRef.current = el;
         sectionEl.current = el;
       }}
-      className="relative h-svh min-h-[640px] w-full overflow-hidden bg-surface"
+      className="relative h-svh min-h-[640px] w-full overflow-hidden bg-white"
     >
-      <div className="absolute inset-0 overflow-hidden rounded-[1.25rem] bg-white px-2 shadow-[0_0_0_1px_rgba(0,0,0,0.06)] md:rounded-[1.5rem] md:px-3">
+      <div
+        ref={frameRef}
+        className="absolute inset-0 overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-[0_0_0_1px_rgba(0,0,0,0.06)] md:rounded-[3.5rem] md:p-10"
+        style={{ willChange: "transform, opacity" }}
+      >
         {/* Static clipping window: fixed size and position, defines the
             visible frame. Never transforms, so the white border it sits
             inside stays put no matter what the layer below is doing. */}
-        <div className="relative h-full w-full overflow-hidden rounded-[0.85rem] md:rounded-[1rem]">
+        <div className="relative h-full w-full overflow-hidden rounded-[1.75rem] md:rounded-[2.5rem]">
           <div ref={parallaxRef} className="absolute inset-0">
             <Image
               src="/images/interior-side.jpg"
@@ -147,14 +171,15 @@ export default function Hero() {
       <div className="relative z-10 flex h-full flex-col items-start justify-start px-6 pt-32 text-left md:px-12 md:pt-40">
         <h1
           ref={headlineRef}
-          className={`max-w-2xl font-display text-5xl leading-[1.05] transition-all duration-700 ease-out md:text-7xl ${
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-          }`}
+          className={`max-w-2xl font-display text-4xl leading-[1.05] md:text-6xl ${
+            introDone ? "" : "transition-all duration-700 ease-out"
+          } ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           style={{
-            transitionDelay: "600ms",
+            transitionDelay: introDone ? "0ms" : "600ms",
             fontVariationSettings: "'wght' 380",
             color: "#3d2410",
             textShadow: "0 2px 28px rgba(255,255,255,0.55), 0 1px 3px rgba(0,0,0,0.25)",
+            transformOrigin: "left top",
           }}
         >
           Nous ne construisons pas un simulateur. Nous créons une nouvelle

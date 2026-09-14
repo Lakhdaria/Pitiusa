@@ -10,6 +10,7 @@
   --color-brass: #8b7355;
   --color-brass-dim: #dad0be;
   --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-quote: "Cormorant Variable", ui-serif, Georgia, serif;
   --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -23,6 +24,7 @@
   --color-brass: var(--color-brass);
   --color-brass-dim: var(--color-brass-dim);
   --font-display: var(--font-display);
+  --font-quote: var(--font-quote);
   --font-body: var(--font-body);
 }
 
