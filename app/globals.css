@@ -68,6 +68,22 @@ body {
   }
 }
 
+/* --- Simulation card: once a card settles into the left-hand column,
+   only its icon remains — title and summary fade out entirely. --- */
+
+.card-col-layout.card-root {
+  padding: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+.card-col-layout .card-title,
+.card-col-layout .card-summary {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
 /* --- Reveal on scroll: several distinct entrance textures, reversible --- */
 
 .reveal {

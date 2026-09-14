@@ -1,9 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import IntroLaurelSection from "@/components/IntroLaurelSection";
 import SimulationsSection from "@/components/SimulationsSection";
-import ProductSection from "@/components/ProductSection";
-import AnatomySection from "@/components/AnatomySection";
 import CarouselSection from "@/components/CarouselSection";
 import UsesSection from "@/components/UsesSection";
 import StorySection from "@/components/StorySection";
@@ -17,10 +14,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <IntroLaurelSection />
         <SimulationsSection />
-        <ProductSection />
-        <AnatomySection />
         <CarouselSection />
         <UsesSection />
         <StorySection />

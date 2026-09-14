@@ -4,10 +4,10 @@ import Parallax from "./Parallax";
 import { uses } from "@/content/pitiusa";
 
 const images = [
-  { src: "/images/interior-side.jpg", alt: "Vue de profil de la Pitiusa Art Station dans un séjour" },
-  { src: "/images/cockpit-top.jpg", alt: "Vue de dessus du poste de pilotage, volant et écran incurvé" },
+  { src: "/images/interior-side-v2.jpg", alt: "Vue de profil de la Pitiusa Art Station dans un séjour" },
+  { src: "/images/cockpit-top-v2.jpg", alt: "Vue de dessus du poste de pilotage, volant et écran incurvé" },
   { src: "/images/chassis-top.jpg", alt: "Structure interne modulaire de la Pitiusa Art Station" },
-  { src: "/images/loft-top.jpg", alt: "La Pitiusa Art Station vue de haut dans un loft baigné de lumière" },
+  { src: "/images/loft-aerial-v2.jpg", alt: "La Pitiusa Art Station vue de haut dans un loft baigné de lumière" },
 ];
 
 export default function UsesSection() {

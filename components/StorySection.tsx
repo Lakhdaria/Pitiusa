@@ -14,7 +14,7 @@ export default function StorySection() {
         <Reveal variant="left" className="w-full md:w-2/5">
           <Parallax strength={20} className="relative aspect-[3/4] w-full overflow-hidden">
             <Image
-              src="/images/loft-wide.jpg"
+              src="/images/lounge-wood.jpg"
               alt="La Pitiusa Art Station dans le hall d'une résidence, sol en bois sombre"
               fill
               sizes="(min-width: 768px) 40vw, 100vw"

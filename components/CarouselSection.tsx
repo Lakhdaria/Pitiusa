@@ -5,11 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const slides = [
-  { src: "/images/interior-side.jpg", caption: "Une silhouette sculptée dans la matière." },
-  { src: "/images/cockpit-top.jpg", caption: "Un poste de pilotage haute-fidélité." },
+  { src: "/images/interior-side-v2.jpg", caption: "Une silhouette sculptée dans la matière." },
+  { src: "/images/cockpit-top-v2.jpg", caption: "Un poste de pilotage haute-fidélité." },
   { src: "/images/chassis-top.jpg", caption: "Une architecture entièrement modulable." },
-  { src: "/images/rear-detail.jpg", caption: "Une œuvre pensée sous tous les angles." },
-  { src: "/images/loft-top.jpg", caption: "Une présence qui redéfinit l'espace." },
+  { src: "/images/front-detail-v2.jpg", caption: "Chaque écran porte la signature de la maison." },
+  { src: "/images/rear-detail-v2.jpg", caption: "Une œuvre pensée sous tous les angles." },
+  { src: "/images/loft-aerial-v2.jpg", caption: "Une présence qui redéfinit l'espace." },
 ];
 
 const COUNT = slides.length;

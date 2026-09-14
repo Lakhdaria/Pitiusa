@@ -145,16 +145,16 @@ export default function Hero() {
     >
       <div
         ref={frameRef}
-        className="absolute inset-0 overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-[0_0_0_1px_rgba(0,0,0,0.06)] md:rounded-[3.5rem] md:p-10"
+        className="absolute inset-0 overflow-hidden rounded-[1.75rem] bg-white p-3 shadow-[0_0_0_1px_rgba(0,0,0,0.06)] md:rounded-[2.5rem] md:p-5"
         style={{ willChange: "transform, opacity" }}
       >
         {/* Static clipping window: fixed size and position, defines the
             visible frame. Never transforms, so the white border it sits
             inside stays put no matter what the layer below is doing. */}
-        <div className="relative h-full w-full overflow-hidden rounded-[1.75rem] md:rounded-[2.5rem]">
+        <div className="relative h-full w-full overflow-hidden rounded-[1.25rem] md:rounded-[1.75rem]">
           <div ref={parallaxRef} className="absolute inset-0">
             <Image
-              src="/images/interior-side.jpg"
+              src="/images/interior-side-v2.jpg"
               alt="Pitiusa Art Station installée dans un séjour, écran affichant le logo Pitiusa"
               fill
               priority
@@ -182,8 +182,7 @@ export default function Hero() {
             transformOrigin: "left top",
           }}
         >
-          Nous ne construisons pas un simulateur. Nous créons une nouvelle
-          catégorie d&rsquo;art.
+          Discover Pitiusa Art Station
         </h1>
       </div>
     </section>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const links = [
   { href: "#art-station", label: "L'Art Station" },
@@ -62,8 +63,15 @@ export default function Header() {
               : "border-brass-dim/25 bg-surface/35"
           }`}
         >
-          <a href="#" className="font-display text-xl tracking-tight text-bone">
-            Pitiusa
+          <a href="#" className="relative block h-8 w-[124px] overflow-hidden rounded-md md:h-9 md:w-[140px]">
+            <Image
+              src="/logo/pitiusa-box-white.png"
+              alt="Pitiusa Art Station"
+              fill
+              sizes="140px"
+              className="object-contain object-left"
+              priority
+            />
           </a>
 
           <nav className="hidden md:flex gap-8">
